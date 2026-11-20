@@ -7,10 +7,13 @@ class AgreementInput(BaseModel):
     quiet_to:int=Field(ge=0,le=1439)
     threshold:float=Field(gt=0,le=5000,allow_inf_nan=False)
     observation_days:int=Field(ge=1,le=30)
+    plan_id:int|None=Field(default=None,gt=0)
+    estimate_id:int|None=Field(default=None,gt=0)
     @model_validator(mode='after')
     def distinct(self):
         if self.party_a.strip()==self.party_b.strip():raise ValueError('必须两名不同参与方')
         if self.quiet_from==self.quiet_to:raise ValueError('起止时刻不可相同')
+        if (self.plan_id is None)!=(self.estimate_id is None):raise ValueError('方案与估算依据须同时指定')
         self.party_a=self.party_a.strip();self.party_b=self.party_b.strip()
         return self
 class SignatureInput(BaseModel):
